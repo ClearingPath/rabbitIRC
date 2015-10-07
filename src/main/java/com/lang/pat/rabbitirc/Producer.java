@@ -21,14 +21,14 @@ public class Producer {
     private ConnectionFactory factory;
     private Connection connection;
     private Channel channel;
-    private String EXCHANGE_NAME = "lang.pat.rabbitIRC";
     
-    Producer(){
+    public Producer(){
         try {
             factory = new ConnectionFactory();
             factory.setHost(ClientMain.HOSTNAME);
             connection = factory.newConnection();
             channel = connection.createChannel();
+            channel.exchangeDeclare(ClientMain.EXCHANGE_NAME, "direct");
         } catch (IOException ex) {
             Logger.getLogger(Producer.class.getName()).log(Level.SEVERE, null, ex);
         } catch (TimeoutException ex) {
@@ -36,6 +36,29 @@ public class Producer {
         }
     }
     
-
+    /**
+     *
+     * @throws java.lang.Throwable
+     */
+    @Override
+    public void finalize() throws Throwable{
+           channel.close();
+           connection.close();
+           super.finalize();    
+    }
+    
+    public void send(String Message){
+        for (String c : ClientMain.ChannelList){
+            send(Message,c);
+        }
+    }
+    
+    public void send(String Message, String Channel){
+        try {
+            channel.basicPublish(ClientMain.EXCHANGE_NAME, Channel, null, Message.getBytes());
+        } catch (IOException ex) {
+            Logger.getLogger(Producer.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
     
 }

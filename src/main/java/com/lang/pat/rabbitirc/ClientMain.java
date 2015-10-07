@@ -15,6 +15,8 @@ public class ClientMain {
     public static String HOSTNAME = "localhost";
     public static ArrayList<String> ChannelList = new ArrayList<>();
     public static String USERNAME;
+    public static String QUEUENAME;
+    public static String EXCHANGE_NAME = "lang.pat.rabbitIRC";
     
     public int JoinChannel(String Channel){
         for (String item : ChannelList){
@@ -23,6 +25,7 @@ public class ClientMain {
                 return 1;
             }
         }
+        
         ClientMain.ChannelList.add(Channel);
 //        System.out.println("Successful join : " + Channel);
         return 0;

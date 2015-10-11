@@ -12,9 +12,14 @@ import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.Envelope;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 /**
  *
@@ -67,7 +72,23 @@ public class Consumer {
             public void handleDelivery(String consumerTag, Envelope envelope,
                     AMQP.BasicProperties properties, byte[] body) throws IOException {
                 String message = new String(body, "UTF-8");
-                System.out.println(" [x] Received '" + envelope.getRoutingKey() + "':'" + message + "'");
+		    JSONParser parse = new JSONParser();
+		    SimpleDateFormat formatDate = new SimpleDateFormat("yy-MM-dd HH:mm:ss");
+		    try {
+			  JSONObject JSONMessage = (JSONObject) parse.parse(message);
+			  
+			  Date sendDat = new Date();
+			  sendDat.setTime((long) JSONMessage.get("timestamp"));
+			  System.out.println("[" + envelope.getRoutingKey() + "] " 
+							  + "[" + JSONMessage.get("username")
+							  + "] " + JSONMessage.get("message")
+							  + " || " + formatDate.format(sendDat));
+			  System.out.print("> ");
+			  
+		    } catch (ParseException ex) {
+			  Logger.getLogger(Consumer.class.getName()).log(Level.SEVERE, null, ex);
+		    }
+		    
             }
         };
         try {

@@ -26,6 +26,7 @@ public class Producer {
         try {
             factory = new ConnectionFactory();
             factory.setHost(ClientMain.HOSTNAME);
+		
             connection = factory.newConnection();
             channel = connection.createChannel();
             channel.exchangeDeclare(ClientMain.EXCHANGE_NAME, "direct");

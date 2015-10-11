@@ -151,22 +151,48 @@ public class ClientMain {
 		
 		switch (Command){
 		    case "/NICK":
-			  res = clientmain.ChangeNick(resSplit[1]);
+			  String newNick;
+			  if (resSplit.length < 2){
+				System.out.print("# Enter new nickname: ");
+				newNick = input.nextLine();
+			  }
+			  else {
+				newNick = resSplit[1];
+			  }
+			  res = clientmain.ChangeNick(newNick);
 			  if (res == 1){System.out.println("! Entered username is currently active username!"); }
 			  else if (res == 0) { System.out.println("# Username changed to " + resSplit[1]); }
 			  break;
 			  
 		    case "/JOIN":
-			  res = clientmain.JoinChannel(resSplit[1]);
-			  if (res == 0) {System.out.println("# User " + USERNAME + " has entered channel " + resSplit[1]); }
-			  else if (res == 1) {System.out.println("! User " + USERNAME + " already entered channel " + resSplit[1] + "!"); }
-			  else {System.out.println("! User " + USERNAME + " failed to enter channel " + resSplit[1] + "!");}
+			  String chnName;
+			  if (resSplit.length < 2){
+				System.out.print("# Enter channel name: ");
+				chnName = input.nextLine();
+			  }
+			  else {
+				chnName = resSplit[1];
+			  }
+			  
+			  res = clientmain.JoinChannel(chnName);
+			  if (res == 0) {System.out.println("# User " + USERNAME + " has entered channel " + chnName); }
+			  else if (res == 1) {System.out.println("! User " + USERNAME + " already entered channel " + chnName + "!"); }
+			  else {System.out.println("! User " + USERNAME + " failed to enter channel " + chnName + "!");}
 			  break;
 			  
 		    case "/LEAVE":
-			  res = clientmain.LeaveChannel(resSplit[1]);
-			  if (res == 0) {System.out.println("# User " + USERNAME + " has left channel " + resSplit[1]); }
-			  else {System.out.println("! User " + USERNAME + " failed to leave channel " + resSplit[1]); }
+			  String chnName2;
+			  if (resSplit.length < 2){
+				System.out.print("# Enter channel name: ");
+				chnName2 = input.nextLine();
+			  }
+			  else {
+				chnName2 = resSplit[1];
+			  }
+			  
+			  res = clientmain.LeaveChannel(chnName2);
+			  if (res == 0) {System.out.println("# User " + USERNAME + " has left channel " + chnName2); }
+			  else {System.out.println("! User " + USERNAME + " failed to leave channel " + chnName2); }
 			  break;
 			  
 		    case "/EXIT":

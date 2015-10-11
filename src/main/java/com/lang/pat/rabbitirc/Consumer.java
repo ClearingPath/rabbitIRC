@@ -83,7 +83,16 @@ public class Consumer {
 							  + "[" + JSONMessage.get("username")
 							  + "] " + JSONMessage.get("message")
 							  + " || " + formatDate.format(sendDat));
-			  System.out.print("> ");
+			  
+                          if (JSONMessage.get("username").toString().equals(ClientMain.USERNAME)){
+                              if(!JSONMessage.get("token").toString().equals(ClientMain.token)){
+                                  System.out.print("! Someone is using the same username... ");
+                                  System.out.println("Please change your nick ! Using /nick [username]");
+                              }
+                          }
+                          
+                          System.out.print("> ");
+                          
 			  
 		    } catch (ParseException ex) {
 			  Logger.getLogger(Consumer.class.getName()).log(Level.SEVERE, null, ex);

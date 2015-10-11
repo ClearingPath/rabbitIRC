@@ -5,8 +5,12 @@
  */
 package com.lang.pat.rabbitirc;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.json.simple.JSONObject;
 
 /**
@@ -22,6 +26,7 @@ public class ClientMain {
     public static String QUEUENAME;
     public static String EXCHANGE_NAME = "lang.pat.rabbitIRC";
     public static boolean exit = false;
+    public static String token;
 
     private Consumer consumer;
     private Producer producer;
@@ -33,6 +38,32 @@ public class ClientMain {
 	  System.out.println("* Init producer...");
 	  producer = new Producer();
 	  System.out.println("* Producer initialized successfully...");
+          CreateToken();
+    }
+    
+    private void CreateToken(){
+        try {
+            int randEnd = (int) (Math.random() * 99);
+            Thread.sleep(randEnd);
+            randEnd = (int) (Math.random() * 9999);
+            String timestamp = String.valueOf(System.currentTimeMillis()) + randEnd;
+            
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            md.update(timestamp.getBytes());
+            
+            byte byteData[] = md.digest();
+            
+            StringBuffer sb = new StringBuffer();
+            for (int i = 0; i < byteData.length; i++) {
+                sb.append(Integer.toString((byteData[i] & 0xff) + 0x100, 16).substring(1));
+            }
+            
+            token = sb.toString();
+        } catch (NoSuchAlgorithmException ex) {
+            Logger.getLogger(ClientMain.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(ClientMain.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     public int JoinChannel(String Channel) {
@@ -79,6 +110,7 @@ public class ClientMain {
 	  JSONMessage.put("username", USERNAME);
 	  JSONMessage.put("message", Message);
 	  JSONMessage.put("timestamp", System.currentTimeMillis());
+          JSONMessage.put("token", token);
 
 	  producer.send(JSONMessage.toJSONString());
 	  return ret;
@@ -90,7 +122,8 @@ public class ClientMain {
 	  JSONMessage.put("username", USERNAME);
 	  JSONMessage.put("message", Message);
 	  JSONMessage.put("timestamp", System.currentTimeMillis());
-	  
+	  JSONMessage.put("token", token);
+          
 	  if (ChannelList.contains(ChannelName) )
 		producer.send(JSONMessage.toJSONString(), ChannelName);
 	  else 

@@ -69,14 +69,12 @@ public class ClientMain {
     public int JoinChannel(String Channel) {
 	  for (String item : ChannelList) {
 		if (item.equals(Channel)) {
-//                System.out.println("!!! : Already join the "+ Channel +" !");
 		    return 1;
 		}
 	  }
 
 	  ClientMain.ChannelList.add(Channel);
 	  consumer.AddChannel(Channel);
-//        System.out.println("Successful join : " + Channel);
 	  return 0;
     }
 
@@ -85,17 +83,14 @@ public class ClientMain {
 		if (item.equals(Channel)) {
 		    ClientMain.ChannelList.remove(Channel);
 		    consumer.RemoveChannel(Channel);
-//                System.out.println("Successful leaving : " + Channel);
 		    return 0;
 		}
 	  }
-//        System.out.println("!!! : Error leaving " + Channel + " !");
 	  return 1;
     }
 
     public int ChangeNick(String Nick) {
 	  if (USERNAME.equals(Nick)) {
-		//error same username
 		return 1;
 	  } else {
 		ChannelList.clear();
@@ -153,7 +148,6 @@ public class ClientMain {
     }
 
     public static void main(String[] args) {
-	  // TODO implements menu and application
 	  final ClientMain clientmain = new ClientMain();
 	  Scanner input = new Scanner(System.in);
 	  

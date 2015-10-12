@@ -86,8 +86,7 @@ public class Consumer {
 			  
                           if (JSONMessage.get("username").toString().equals(ClientMain.USERNAME)){
                               if(!JSONMessage.get("token").toString().equals(ClientMain.token)){
-                                  System.out.print("! Someone is using the same username... ");
-                                  System.out.println("Please change your nick ! Using /nick [username]");
+                                  System.out.print("! Duplicate username, please change to avoid conflict!");
                               }
                           }
                           

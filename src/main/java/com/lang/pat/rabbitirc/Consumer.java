@@ -26,83 +26,83 @@ import org.json.simple.parser.ParseException;
  * @author ClearingPath
  */
 public class Consumer {
+
     private ConnectionFactory factory;
     private Connection connection;
     private Channel channel;
-    
-    public Consumer(){
-        try {
-            factory = new ConnectionFactory();
-            factory.setHost(ClientMain.HOSTNAME);
-            connection = factory.newConnection();
-            channel = connection.createChannel();
-            ClientMain.QUEUENAME = channel.queueDeclare().getQueue();
-        } catch (IOException ex) {
-            Logger.getLogger(Consumer.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (TimeoutException ex) {
-            Logger.getLogger(Consumer.class.getName()).log(Level.SEVERE, null, ex);
-        }
+
+    public Consumer() {
+	  try {
+		factory = new ConnectionFactory();
+		factory.setHost(ClientMain.HOSTNAME);
+		connection = factory.newConnection();
+		channel = connection.createChannel();
+		ClientMain.QUEUENAME = channel.queueDeclare().getQueue();
+	  } catch (IOException ex) {
+		Logger.getLogger(Consumer.class.getName()).log(Level.SEVERE, null, ex);
+	  } catch (TimeoutException ex) {
+		Logger.getLogger(Consumer.class.getName()).log(Level.SEVERE, null, ex);
+	  }
     }
-    
-    public int AddChannel(String ChannelName){
-        int ret = 0;
-        try {
-            channel.queueBind(ClientMain.QUEUENAME, ClientMain.EXCHANGE_NAME, ChannelName);
-        } catch (IOException ex) {
-            Logger.getLogger(Consumer.class.getName()).log(Level.SEVERE, null, ex);
-            ret = 1;
-        }
-        return ret;
+
+    public int AddChannel(String ChannelName) {
+	  int ret = 0;
+	  try {
+		channel.queueBind(ClientMain.QUEUENAME, ClientMain.EXCHANGE_NAME, ChannelName);
+	  } catch (IOException ex) {
+		Logger.getLogger(Consumer.class.getName()).log(Level.SEVERE, null, ex);
+		ret = 1;
+	  }
+	  return ret;
     }
-    
-    public int RemoveChannel(String ChannelName){
-        int ret = 0;
-        try {
-            channel.queueUnbind(ClientMain.QUEUENAME, ClientMain.EXCHANGE_NAME, ChannelName);
-        } catch (IOException ex) {
-            Logger.getLogger(Consumer.class.getName()).log(Level.SEVERE, null, ex);
-            ret = 1;
-        }
-        return ret;
+
+    public int RemoveChannel(String ChannelName) {
+	  int ret = 0;
+	  try {
+		channel.queueUnbind(ClientMain.QUEUENAME, ClientMain.EXCHANGE_NAME, ChannelName);
+	  } catch (IOException ex) {
+		Logger.getLogger(Consumer.class.getName()).log(Level.SEVERE, null, ex);
+		ret = 1;
+	  }
+	  return ret;
     }
-    
-    public void consume(){
-        com.rabbitmq.client.Consumer consumer = new DefaultConsumer(channel) {
-            @Override
-            public void handleDelivery(String consumerTag, Envelope envelope,
-                    AMQP.BasicProperties properties, byte[] body) throws IOException {
-                String message = new String(body, "UTF-8");
+
+    public void consume() {
+	  com.rabbitmq.client.Consumer consumer = new DefaultConsumer(channel) {
+		@Override
+		public void handleDelivery(String consumerTag, Envelope envelope,
+		    AMQP.BasicProperties properties, byte[] body) throws IOException {
+		    String message = new String(body, "UTF-8");
 		    JSONParser parse = new JSONParser();
 		    SimpleDateFormat formatDate = new SimpleDateFormat("yy-MM-dd HH:mm:ss");
 		    try {
 			  JSONObject JSONMessage = (JSONObject) parse.parse(message);
-			  
+
 			  Date sendDat = new Date();
 			  sendDat.setTime((long) JSONMessage.get("timestamp"));
-			  System.out.println("[" + envelope.getRoutingKey() + "] " 
-							  + "[" + JSONMessage.get("username")
-							  + "] " + JSONMessage.get("message")
-							  + " || " + formatDate.format(sendDat));
-			  
-                          if (JSONMessage.get("username").toString().equals(ClientMain.USERNAME)){
-                              if(!JSONMessage.get("token").toString().equals(ClientMain.token)){
-                                  System.out.print("! Duplicate username, please change to avoid conflict!");
-                              }
-                          }
-                          
-                          System.out.print("> ");
-                          
-			  
+			  System.out.println("[" + envelope.getRoutingKey() + "] "
+				+ "[" + JSONMessage.get("username")
+				+ "] " + JSONMessage.get("message")
+				+ " || " + formatDate.format(sendDat));
+
+			  if (JSONMessage.get("username").toString().equals(ClientMain.USERNAME)) {
+				if (!JSONMessage.get("token").toString().equals(ClientMain.token)) {
+				    System.out.print("! Duplicate username, please change to avoid conflict!");
+				}
+			  }
+
+			  System.out.print("> ");
+
 		    } catch (ParseException ex) {
 			  Logger.getLogger(Consumer.class.getName()).log(Level.SEVERE, null, ex);
 		    }
-		    
-            }
-        };
-        try {
-            channel.basicConsume(ClientMain.QUEUENAME, true, consumer);
-        } catch (IOException ex) {
-            Logger.getLogger(Consumer.class.getName()).log(Level.SEVERE, null, ex);
-        }
+
+		}
+	  };
+	  try {
+		channel.basicConsume(ClientMain.QUEUENAME, true, consumer);
+	  } catch (IOException ex) {
+		Logger.getLogger(Consumer.class.getName()).log(Level.SEVERE, null, ex);
+	  }
     }
 }
